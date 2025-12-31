@@ -70,6 +70,7 @@ Attribution 4.0 International License.
 
 ## From Figure 1 of The Verse Calculus paper:
 
+```
 VC Syntax:
 
 Integers	𝑘
@@ -103,10 +104,11 @@ if (∃x₁ ···xₙ . e₁ ) then e₂ else e₃	means  (one{(∃x₁ ···x
 
 † Apply this rule only if at least one of the eᵢ is not a value v.
 ‡ Apply this rule only if either (i) e₁ is not a value v, or (ii) e₁ = e₂ is not to the left of a “;”.
-
+```
 
 ## From Figure 3 of The Verse Calculus paper:
 
+```
 Application:
 app-add	add⟨k₁ , k₂ ⟩ −→ k₃	where 𝑘₃ = 𝑘₁ + 𝑘₂
 app-gt	gt⟨k₁ , k₂ ⟩ −→ k₁	if 𝑘₁ > 𝑘₂
@@ -150,9 +152,11 @@ choose-assoc	(e₁ ⊕ e₂) ⊕ e₃ −→ e₁ ⊕ (e₂ ⊕ e₃ )
 choose		SX [𝐶𝑋 [ e₁ ⊕ e₂ ] ] −→ SX [𝐶𝑋 [ e₁ ] ⊕ 𝐶𝑋 [ e₂ ] ]
 
 Note: In the rules marked with a superscript 𝛼, use 𝛼-conversion to satisfy the side condition.
+```
 
 ## From Figure 4 of The Verse Calculus paper:
 
+```
 Contexts:
 Execution contexts	𝑋 ::= □ | v = 𝑋 ; e | 𝑋 ; e | 𝑒𝑞; 𝑋
 Value contexts		𝑉 ::= □ | ⟨v₁, ···, V, ···, vₙ ⟩
@@ -163,3 +167,4 @@ Choice-free exprs	𝑐𝑒 ::= v | ceq; ce | one{e} | all{e} | ∃x. ce | op(v)
 	    		𝑐𝑒𝑞 ::= ce | v = ce
 
 Note: The □ in 𝑋 can only be an expression, not an equation.
+```
