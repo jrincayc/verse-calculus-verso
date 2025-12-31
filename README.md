@@ -18,7 +18,7 @@ syntax sugar for extended expressions. I am fairly certain that
 additional testing can find edge cases that don't work, and other
 problems.
 
-The REPL that this includes as been helpful to me for understanding
+The REPL that this includes has been helpful to me for understanding
 Verse Calculus better and so I am putting this on github for others to
 use, or have as an example of what can be done with LLMs in late 2025.
 
