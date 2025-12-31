@@ -1,0 +1,21 @@
+[package]
+name = "verse-calculus-verso"
+version = "0.1.0"
+edition = "2021"
+authors = ["Claude Sonnet 4.5 (Anthropic)", "Joshua Cogliati"]
+description = "An experimental implementation of the Verse Calculus with REPL"
+license = "CC-BY-4.0"
+
+[dependencies]
+nom = "7"
+thiserror = "1"
+anyhow = "1"
+
+[dev-dependencies]
+proptest = "1"
+pretty_assertions = "1"
+criterion = "0.5"
+
+[[test]]
+name = "parser_test"
+path = "tests/parser_test.rs"
