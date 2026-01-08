@@ -37,7 +37,7 @@ fn exi_float(expr: &Expr) -> Option<Expr> {
             match eq {
                 ExprOrEqn::Expr(eq_expr) => {
                     if let Expr::Exists(x, inner) = &**eq_expr {
-                        let eq_fvs = eq_expr.free_vars();
+                        let _eq_fvs = eq_expr.free_vars();
                         let rest_fvs = e.free_vars();
 
                         // Check if x is free in the rest (not in the equation itself)

@@ -16,12 +16,12 @@
 use crate::ast::*;
 use nom::{
     branch::alt,
-    bytes::complete::{tag, take_while1},
+    bytes::complete::tag,
     character::complete::{alpha1, alphanumeric1, char, digit1, multispace0, multispace1},
     combinator::{map, opt, recognize},
     error::{context, VerboseError, ParseError},
-    multi::{many0, separated_list0, separated_list1, many1},
-    sequence::{delimited, pair, preceded, terminated, tuple},
+    multi::{many0, separated_list0, separated_list1},
+    sequence::{delimited, pair, preceded, tuple},
     IResult,
 };
 
@@ -38,7 +38,7 @@ where
     delimited(multispace0, inner, multispace0)
 }
 
-fn keyword<'a>(kw: &'a str) -> impl FnMut(&'a str) -> ParseResult<&'a str> {
+fn keyword<'a>(kw: &'a str) -> impl FnMut(&'a str) -> ParseResult<'a, &'a str> {
     move |input| {
         let (input, _) = multispace0(input)?;  // Consume leading whitespace
         let (input, word) = tag(kw)(input)?;   // Match the keyword
@@ -51,7 +51,7 @@ fn keyword<'a>(kw: &'a str) -> impl FnMut(&'a str) -> ParseResult<&'a str> {
 // Variables and Identifiers
 // ============================================================================
 
-fn identifier(input: &str) -> ParseResult<String> {
+fn identifier(input: &str) -> ParseResult<'_, String> {
     context(
         "identifier",
         map(
@@ -64,7 +64,7 @@ fn identifier(input: &str) -> ParseResult<String> {
     )(input)
 }
 
-fn variable(input: &str) -> ParseResult<Var> {
+fn variable(input: &str) -> ParseResult<'_, Var> {
     context("variable", map(identifier, Var::new))(input)
 }
 
@@ -72,7 +72,7 @@ fn variable(input: &str) -> ParseResult<Var> {
 // Literals
 // ============================================================================
 
-fn integer(input: &str) -> ParseResult<IntLit> {
+fn integer(input: &str) -> ParseResult<'_, IntLit> {
     context(
         "integer",
         map(
@@ -86,7 +86,7 @@ fn integer(input: &str) -> ParseResult<IntLit> {
 // Values and Head-Normal Forms
 // ============================================================================
 
-fn value(input: &str) -> ParseResult<Value> {
+fn value(input: &str) -> ParseResult<'_, Value> {
     context(
         "value",
         alt((
@@ -100,7 +100,7 @@ fn value(input: &str) -> ParseResult<Value> {
     )(input)
 }
 
-fn hnf(input: &str) -> ParseResult<HeadNormalForm> {
+fn hnf(input: &str) -> ParseResult<'_, HeadNormalForm> {
     context(
         "head-normal form",
         alt((
@@ -112,7 +112,7 @@ fn hnf(input: &str) -> ParseResult<HeadNormalForm> {
     )(input)
 }
 
-fn primop(input: &str) -> ParseResult<HeadNormalForm> {
+fn primop(input: &str) -> ParseResult<'_, HeadNormalForm> {
     context(
         "primitive operator",
         alt((
@@ -122,7 +122,7 @@ fn primop(input: &str) -> ParseResult<HeadNormalForm> {
     )(input)
 }
 
-fn tuple_value(input: &str) -> ParseResult<Vec<Value>> {
+fn tuple_value(input: &str) -> ParseResult<'_, Vec<Value>> {
     context(
         "tuple",
         delimited(
@@ -133,7 +133,7 @@ fn tuple_value(input: &str) -> ParseResult<Vec<Value>> {
     )(input)
 }
 
-fn lambda(input: &str) -> ParseResult<(Var, Box<Expr>)> {
+fn lambda(input: &str) -> ParseResult<'_, (Var, Box<Expr>)> {
     context(
         "lambda",
         map(
@@ -152,11 +152,11 @@ fn lambda(input: &str) -> ParseResult<(Var, Box<Expr>)> {
 // Core Expressions
 // ============================================================================
 
-fn expr(input: &str) -> ParseResult<Expr> {
+fn expr(input: &str) -> ParseResult<'_, Expr> {
     context("expression", choice_expr)(input)
 }
 
-fn choice_expr(input: &str) -> ParseResult<Expr> {
+fn choice_expr(input: &str) -> ParseResult<'_, Expr> {
     let (input, first) = seq_expr(input)?;
     let (input, rest) = many0(preceded(
         ws(alt((tag("⊕"), tag("|")))),
@@ -170,7 +170,7 @@ fn choice_expr(input: &str) -> ParseResult<Expr> {
     ))
 }
 
-fn seq_expr(input: &str) -> ParseResult<Expr> {
+fn seq_expr(input: &str) -> ParseResult<'_, Expr> {
     // First, parse an exists_expr (or lower)
     let (input, first) = exists_expr(input)?;
 
@@ -197,7 +197,7 @@ fn seq_expr(input: &str) -> ParseResult<Expr> {
     Ok((input, first))
 }
 
-fn exists_expr(input: &str) -> ParseResult<Expr> {
+fn exists_expr(input: &str) -> ParseResult<'_, Expr> {
     // Try to parse "∃x y z. e"
     if let Ok((input, _)) = ws::<_, _>(alt((char('∃'), char('?'))))(input) {
         let (input, vars) = context("variable list",separated_list1(multispace1, variable))(input)?;
@@ -215,7 +215,7 @@ fn exists_expr(input: &str) -> ParseResult<Expr> {
     }
 }
 
-fn application_expr(input: &str) -> ParseResult<Expr> {
+fn application_expr(input: &str) -> ParseResult<'_, Expr> {
     let (input, first) = atom_expr(input)?;
     let (input, rest) = many0(atom_expr)(input)?;
 
@@ -239,7 +239,7 @@ fn application_expr(input: &str) -> ParseResult<Expr> {
     }
 }
 
-fn atom_expr(input: &str) -> ParseResult<Expr> {
+fn atom_expr(input: &str) -> ParseResult<'_, Expr> {
     let (input, _) = multispace0(input)?;  // Consume leading whitespace first
     context(
         "atom expression",
@@ -266,11 +266,11 @@ fn atom_expr(input: &str) -> ParseResult<Expr> {
 // Extended Syntax Parser
 // ============================================================================
 
-fn extended_expr(input: &str) -> ParseResult<ExtendedExpr> {
+fn extended_expr(input: &str) -> ParseResult<'_, ExtendedExpr> {
     context("extended expression", extended_choice)(input)
 }
 
-fn extended_choice(input: &str) -> ParseResult<ExtendedExpr> {
+fn extended_choice(input: &str) -> ParseResult<'_, ExtendedExpr> {
     let (input, first) = extended_seq(input)?;
     let (input, rest) = many0(preceded(
         ws(alt((tag("⊕"), tag("|")))),
@@ -285,7 +285,7 @@ fn extended_choice(input: &str) -> ParseResult<ExtendedExpr> {
     ))
 }
 
-fn extended_seq(input: &str) -> ParseResult<ExtendedExpr> {
+fn extended_seq(input: &str) -> ParseResult<'_, ExtendedExpr> {
     let (input, first) = extended_exists(input)?;
 
     if let Ok((input, _)) = ws::<_, _>(char(';'))(input) {
@@ -299,7 +299,7 @@ fn extended_seq(input: &str) -> ParseResult<ExtendedExpr> {
     }
 }
 
-fn extended_exists(input: &str) -> ParseResult<ExtendedExpr> {
+fn extended_exists(input: &str) -> ParseResult<'_, ExtendedExpr> {
     if let Ok((input, _)) = ws::<_, _>(alt((char('∃'), char('?'))))(input) {
         let (input, vars) = separated_list1(multispace1, variable)(input)?;
         let (input, _) = ws(char('.'))(input)?;
@@ -311,7 +311,7 @@ fn extended_exists(input: &str) -> ParseResult<ExtendedExpr> {
     }
 }
 
-fn extended_binop(input: &str) -> ParseResult<ExtendedExpr> {
+fn extended_binop(input: &str) -> ParseResult<'_, ExtendedExpr> {
     let (input, first) = extended_app(input)?;
 
     if let Ok((input, op)) = ws::<_, _>(alt((char('+'), char('>'))))(input) {
@@ -327,7 +327,7 @@ fn extended_binop(input: &str) -> ParseResult<ExtendedExpr> {
     }
 }
 
-fn extended_app(input: &str) -> ParseResult<ExtendedExpr> {
+fn extended_app(input: &str) -> ParseResult<'_, ExtendedExpr> {
     let (input, first) = extended_atom(input)?;
     let (input, rest) = many0(extended_atom)(input)?;
 
@@ -339,7 +339,7 @@ fn extended_app(input: &str) -> ParseResult<ExtendedExpr> {
     ))
 }
 
-fn extended_atom(input: &str) -> ParseResult<ExtendedExpr> {
+fn extended_atom(input: &str) -> ParseResult<'_, ExtendedExpr> {
     context(
         "extended atom",
         alt((
@@ -360,7 +360,7 @@ fn extended_atom(input: &str) -> ParseResult<ExtendedExpr> {
     )(input)
 }
 
-fn extended_if(input: &str) -> ParseResult<ExtendedExpr> {
+fn extended_if(input: &str) -> ParseResult<'_, ExtendedExpr> {
     let (input, _) = keyword("if")(input)?;
     let (input, _) = ws(char('('))(input)?;
 
@@ -391,7 +391,7 @@ fn extended_if(input: &str) -> ParseResult<ExtendedExpr> {
     ))
 }
 
-fn extended_for(input: &str) -> ParseResult<ExtendedExpr> {
+fn extended_for(input: &str) -> ParseResult<'_, ExtendedExpr> {
     let (input, _) = keyword("for")(input)?;
     let (input, _) = ws(char('('))(input)?;
 

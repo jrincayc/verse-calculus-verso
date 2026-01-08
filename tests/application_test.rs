@@ -169,7 +169,7 @@ fn test_app_tup_multiple() {
 
     // Should create choice structure
     match result.unwrap() {
-        Expr::Exists(x, e) => {
+        Expr::Exists(_x, e) => {
             // Has binding x = v
             match *e {
                 Expr::Seq(ExprOrEqn::Eqn(_, _), body) => {

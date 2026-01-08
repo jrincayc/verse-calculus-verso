@@ -14,7 +14,6 @@
 // Application rewrite rules (app-add, app-gt, app-beta, app-tup, etc.)
 
 use crate::ast::*;
-use crate::core::subst::substitute;
 
 /// Apply one step of an application rule if possible
 /// Returns Some(new_expr) if a rule applied, None otherwise
@@ -173,7 +172,7 @@ fn app_tup(v1: &Value, v2: &Value) -> Option<Expr> {
 }
 
 /// app-tup-0: ⟨⟩(v) → fail
-fn app_tup_0(v1: &Value, v2: &Value) -> Option<Expr> {
+fn app_tup_0(v1: &Value, _v2: &Value) -> Option<Expr> {
     match v1 {
         Value::Hnf(HeadNormalForm::Tuple(vals)) if vals.is_empty() => Some(Expr::Fail),
         _ => None,

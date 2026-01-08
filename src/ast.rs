@@ -238,7 +238,7 @@ impl ExprOrEqn {
     pub fn is_choice_free(&self) -> bool {
         match self {
             ExprOrEqn::Expr(e) => e.is_choice_free(),
-            ExprOrEqn::Eqn(v, e) => e.is_choice_free(),
+            ExprOrEqn::Eqn(_v, e) => e.is_choice_free(),
         }
     }
 

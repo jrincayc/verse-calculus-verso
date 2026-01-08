@@ -15,7 +15,7 @@
 //               choose-r, choose-l, choose-assoc, choose
 
 use crate::ast::*;
-use crate::core::context::{ScopeContext, ChoiceContext};
+use crate::core::context::ChoiceContext;
 
 /// Apply one step of a choice rule if possible
 pub fn rewrite_choice(expr: &Expr) -> Option<Expr> {

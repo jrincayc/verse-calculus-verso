@@ -103,7 +103,7 @@ fn u_fail(expr: &Expr) -> Option<Expr> {
                     (HeadNormalForm::Op(_), _) | (_, HeadNormalForm::Op(_)) => true,
 
                     // Lambdas - don't fail (stuck)
-                    (HeadNormalForm::Lambda(_, _), _) | (_, HeadNormalForm::Lambda(_, _)) => false,
+                    (HeadNormalForm::Lambda(_, _), _) => false,
                 };
 
                 if should_fail {

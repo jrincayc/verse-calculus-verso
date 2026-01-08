@@ -113,7 +113,7 @@ impl<'a> fmt::Display for PrettyExpr<'a> {
                 }
             }
 
-            Expr::Choice(e1, e2) => {
+            Expr::Choice(_e1, _e2) => {
                 let s = format_choice(expr);
                 if *parent_prec > PREC_CHOICE {
                     write!(f, "({})", s)
@@ -122,7 +122,7 @@ impl<'a> fmt::Display for PrettyExpr<'a> {
                 }
             }
 
-            Expr::Seq(eq, e) => {
+            Expr::Seq(_eq, _e) => {
                 let s = format_seq(expr);
                 if *parent_prec > PREC_SEQ {
                     write!(f, "({})", s)
@@ -131,7 +131,7 @@ impl<'a> fmt::Display for PrettyExpr<'a> {
                 }
             }
 
-            Expr::Exists(x, e) => {
+            Expr::Exists(_x, _e) => {
                 let s = format_exists(expr);
                 if *parent_prec > PREC_EXISTS {
                     write!(f, "({})", s)

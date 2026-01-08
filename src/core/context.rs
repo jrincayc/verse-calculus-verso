@@ -151,7 +151,7 @@ impl ExecContext {
         let mut results = Vec::new();
 
         for (ctx, focused) in ExecContext::decompose(expr) {
-            if let Expr::Seq(ExprOrEqn::Eqn(v, rhs), rest) = &focused {
+            if let Expr::Seq(ExprOrEqn::Eqn(v, _rhs), rest) = &focused {
                 if let Some(x) = v.as_var() {
                     if x == target_var {
                         results.push((ctx, v.clone(), (**rest).clone()));

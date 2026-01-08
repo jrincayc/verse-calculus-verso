@@ -56,7 +56,7 @@ fn test_u_tup() {
     // Should produce nested sequences
     let result = result.unwrap();
     match result {
-        Expr::Seq(ExprOrEqn::Eqn(v1, e1), rest) => {
+        Expr::Seq(ExprOrEqn::Eqn(v1, e1), _rest) => {
             assert_eq!(v1, Value::int(1));
             assert_eq!(*e1, Expr::var("x"));
             // Continue checking nested structure...
