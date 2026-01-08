@@ -395,14 +395,14 @@ fn extended_for(input: &str) -> ParseResult<'_, ExtendedExpr> {
     let (input, _) = keyword("for")(input)?;
     let (input, _) = ws(char('('))(input)?;
 
-    let (input, (vars, gen)) = if let Ok((input, _)) = ws::<_, _>(alt((char('∃'), char('?'))))(input) {
+    let (input, (vars, genvar)) = if let Ok((input, _)) = ws::<_, _>(alt((char('∃'), char('?'))))(input) {
         let (input, vars) = separated_list1(multispace1, variable)(input)?;
         let (input, _) = ws(char('.'))(input)?;
-        let (input, gen) = extended_expr(input)?;
-        (input, (vars, gen))
+        let (input, genvar) = extended_expr(input)?;
+        (input, (vars, genvar))
     } else {
-        let (input, gen) = extended_expr(input)?;
-        (input, (vec![], gen))
+        let (input, genvar) = extended_expr(input)?;
+        (input, (vec![], genvar))
     };
 
     let (input, _) = ws(char(')'))(input)?;
@@ -413,7 +413,7 @@ fn extended_for(input: &str) -> ParseResult<'_, ExtendedExpr> {
         input,
         ExtendedExpr::ForDo {
             vars,
-            generator: Box::new(gen),
+            generator: Box::new(genvar),
             body: Box::new(body),
         },
     ))
